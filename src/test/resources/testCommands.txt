@@ -1,0 +1,87 @@
+login admin 1234
+man
+man pwd
+mkDir /a
+cd /a
+mkDir b
+cd ../
+mkDir c
+mkDir c/d
+cd c/d
+touch file.txt
+read file.txt
+write file.txt 'hello '
+write file.txt 'hello world'
+touch file.txt
+read file.txt 0 25
+read file.txt 15 25
+read flubber.txt
+writeFromFile file.txt src/test/resources/testFileInput.txt
+writeFromFile file.txt dontHaveThisFile
+read file.txt -s
+read dontHaveThisFile -s
+rmDir file.txt
+touch file2.txt
+ls / -l
+rm file.txt
+writeRandom file2.txt 10000000
+cd /
+rmDir /a
+rmDir /a -r
+rmDir /whatDir
+pwd
+touch file1
+touch file2
+touch file3
+touch file4
+ls / -l
+rm file1
+rm file2
+rm file3
+rm file4
+badCommand x
+cd /
+mkDir recipes/a/carrotCake -r
+mkDir recipes/b/carrotCake -r
+mkDir recipes/c/carrotCake -r
+touch recipes/a/carrotCake/dry/flour -r
+touch recipes/a/carrotCake/dry/sugar -r
+touch recipes/a/carrotCake/dry/carrots -r
+touch recipes/a/carrotCake/wet/eggs -r
+touch recipes/a/carrotCake/wet/water -r
+touch recipes/a/carrotCake/wet/oliveoil -r
+touch recipes/b/carrotCake/dry/almondflour -r
+touch recipes/b/carrotCake/dry/monkfruit -r
+touch recipes/b/carrotCake/dry/carrots -r
+touch recipes/b/carrotCake/dry/salt -r
+touch recipes/b/carrotCake/wet/eggsubstitute -r
+touch recipes/b/carrotCake/wet/water -r
+touch recipes/b/carrotCake/wet/soybeanoil -r
+touch recipes/c/carrotCake/dry/milk -r
+touch recipes/c/carrotCake/dry/cake -r
+touch recipes/c/carrotCake/dry/torpedos -r
+touch recipes/c/carrotCake/dry/wrench -r
+touch recipes/c/carrotCake/wet/hammer -r
+touch recipes/c/carrotCake/wet/pee -r
+touch recipes/c/carrotCake/wet/poop -r
+find '^.*carrot.*$'  -al
+find '^.*recipes$'
+logout
+login root 1234
+cp /recipes/a/carrotCake /recipes/b
+ls /recipes/b/carrotCake -l
+cp /recipes/b/carrotCake /recipes/c
+ls /recipes/c/carrotCake
+mv /recipes/b/carrotCake/wet /recipes/c/carrotCake
+mv /recipes/b/carrotCake/dry /recipes/c/carrotCake
+ls recipes/b/carrotCake -l
+setUserPermission / USER 'READ,WRITE,DELETE' -rt
+setUserPermission / barcher 'READ,WRITE,DELETE' -r
+ls / -l
+ls /recipes -l
+logout
+login barcher 1234
+mkDir /recipes2
+cp /recipes /recipes2
+rmDir /recipes -r
+logout

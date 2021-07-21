@@ -1,0 +1,34 @@
+login root 1234
+touch file.txt
+writeRandom file.txt 10000000
+read file.txt -st
+touch file.txt
+writeRandom file.txt 10000000
+cp /file.txt /file2.txt -r
+mkDir a/b/c/d/e/f/g
+mkDir b/c/d/e/f/g/h
+cp /a /b
+rmDir a -r
+cp /file2.txt /file.txt -r
+cp /file.txt /file2.txt -f
+touch file.txt
+writeRandom file.txt 10000000
+read file.txt -st
+cp /file.txt /file2.txt -f
+writeRandom file2.txt 1000000
+read file2.txt -st
+cp /file.txt /file2.txt -f
+writeRandom file.txt 10000000
+read file.txt -st
+cp /file.txt /file2.txt -f
+writeRandom file2.txt 1000000
+read file2.txt -st
+touch file.txt
+writeRandom file.txt 1000000
+read file.txt -st
+touch file2.txt
+writeRandom file2.txt 1000000
+read file2.txt -st
+rm file2.txt
+rm file.txt
+logout
