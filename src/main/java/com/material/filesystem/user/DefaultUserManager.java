@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -57,19 +58,20 @@ public class DefaultUserManager implements UserManager {
         String usersTxt = userTextBuilder.toString();
 
         String[] userLines = usersTxt.split("\n");
-        for (String userLine : userLines) {
-          String[] parts = userLine.split(" ");
-          if (parts.length == 3) {
-            User user = new User(parts[0], parts[1], UserType.valueOf(parts[2]));
-            if ("root".equals(user.getUsername())) {
-              ROOT_USER = user;
-            }
-            _userDb.put(parts[0], user);
-          } else {
-            // TODO - redact any sensitive info
-            LOG.error("users.txt entry invalid: " + userLine);
+        Arrays.stream(userLines).map(line -> line.split(" ")).filter(parts -> {
+          boolean validLength = parts.length == 3;
+          if (!validLength) {
+            // TODO redact
+            LOG.error("users.txt entry invalid: " + Arrays.toString(parts));
           }
-        }
+          return validLength;
+        }).forEach(parts -> {
+          User user = new User(parts[0], parts[1], UserType.valueOf(parts[2]));
+          if ("root".equals(user.getUsername())) {
+            ROOT_USER = user;
+          }
+          _userDb.put(parts[0], user);
+        });
 
         if (!_userDb.isEmpty()) {
           LOG.info("Loaded " + _userDb.size() + " authorized users");

@@ -105,21 +105,14 @@ public class DefaultFileSystem implements FileSystem {
     FileSystemNodeHelper.checkUserPermission(_userManager, currentNode, Permission.READ);
 
     // build up the path to the current node;
-    Matcher matcher = pattern.matcher(currentPath);
-    if (matcher.matches()) {
+    if (pattern.matcher(currentPath).matches()) {
       return currentNode;
     } else {
       if (currentNode.getNodeType().equals(NodeType.DIRECTORY)) {
-        for (FileSystemTreeNode childNode : currentNode.getChildren()) {
-          final String childPath = buildChildPath(currentPath, childNode);
-          FileSystemTreeNode foundNode = findFirstMatchingNode(pattern, childNode, childPath);
-
-          if (foundNode != null) {
-            LOG.debug("Found matching node: " + foundNode.getPath().toString() + " for thread " + Thread.currentThread()
-                .getName());
-            return foundNode;
-          }
-        }
+        return currentNode.getChildren().stream().map(child -> {
+          final String childPath = buildChildPath(currentPath, child);
+          return findFirstMatchingNode(pattern, child, childPath);
+        }).findFirst().orElse(null);
       }
       return null;
     }
@@ -142,23 +135,15 @@ public class DefaultFileSystem implements FileSystem {
     // build up the path to the current node;
     FileSystemNodeHelper.checkUserPermission(_userManager, currentNode, Permission.READ);
 
-    Matcher matcher = pattern.matcher(currentPath);
-    if (matcher.matches()) {
+    if (pattern.matcher(currentPath).matches()) {
       matchingNodes.add(currentNode);
     }
 
     if (currentNode.getNodeType() == NodeType.DIRECTORY) {
-      Collection<FileSystemTreeNode> children = currentNode.getChildren();
-      for (FileSystemTreeNode childNode : children) {
+      currentNode.getChildren().forEach(childNode -> {
         final String childPath = buildChildPath(currentPath, childNode);
         findAllNodesMatching(pattern, childNode, childPath, matchingNodes);
-      }
-
-      if (children.isEmpty()) {
-        LOG.warn("No matching nodes found: " + pattern.pattern());
-      } else {
-        LOG.debug("Found : " + children.size() + " matching nodes for: " + pattern.pattern());
-      }
+      });
     }
   }
 
@@ -296,7 +281,7 @@ public class DefaultFileSystem implements FileSystem {
   }
 
   private FileSystemTreeNode mergeDirectoryContents(FileSystemTreeNode sourceNode, FileSystemTreeNode targetNode,
-      boolean overwriteExistingFiles) {
+      boolean overwriteExistingFiles) throws FileNotFoundException, FileAlreadyExistsException, UnsupportedOperationException {
     if (sourceNode.getNodeType() != NodeType.DIRECTORY || targetNode.getNodeType() != NodeType.DIRECTORY) {
       throw new UnsupportedOperationException("Both nodes must be directories");
     }
@@ -310,13 +295,7 @@ public class DefaultFileSystem implements FileSystem {
 
     try {
       for (FileSystemTreeNode child : sourceNode.getChildren()) {
-        try {
-          moveNodeTo(child.getPath(), targetNode.getPath(), false, false, overwriteExistingFiles);
-        } catch (FileNotFoundException | FileAlreadyExistsException ex) {
-          LOG.warn("Error moving child node", ex);
-        } catch (UnsupportedOperationException ex) {
-          LOG.warn("Unsupported operation when moving child node", ex);
-        }
+        moveNodeTo(child.getPath(), targetNode.getPath(), false, false, overwriteExistingFiles);
       }
     } finally {
       targetNode.release();
@@ -352,7 +331,7 @@ public class DefaultFileSystem implements FileSystem {
   }
 
   private FileSystemTreeNode placeDirectoryNodeInsideDirectoryNode(FileSystemTreeNode sourceNode,
-      FileSystemTreeNode destinationNode, boolean overwriteExistingFiles) {
+      FileSystemTreeNode destinationNode, boolean overwriteExistingFiles) throws FileAlreadyExistsException, FileNotFoundException {
     if (sourceNode.getNodeType() != NodeType.DIRECTORY || destinationNode.getNodeType() != NodeType.DIRECTORY) {
       throw new IllegalArgumentException("Both node types must be directories");
     }
@@ -366,7 +345,7 @@ public class DefaultFileSystem implements FileSystem {
         }
 
         FileSystemTreeNode merged = mergeDirectoryContents(sourceNode, existingChild, overwriteExistingFiles);
-        //  only do this if merge was successful
+        //  only do this if merge was successful. Otherwise, leave the files that weren't' moved under original section
         if (sourceNode.getParent() != null) {
           sourceNode.getParent().removeChild(sourceNode);
         }

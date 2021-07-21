@@ -339,11 +339,7 @@ public class DefaultFileSystemTreeNode implements FileSystemTreeNode {
     if (_nodeType == NodeType.DIRECTORY) {
       startRead();
       try {
-        int size = _children.size();
-        for (FileSystemTreeNode child : _children) {
-          size += child.getSize();
-        }
-        return size;
+        return _children.size() + _children.stream().map(FileSystemTreeNode::getSize).reduce(0, Integer::sum);
       } finally {
         completeRead();
       }

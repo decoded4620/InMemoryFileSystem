@@ -69,7 +69,6 @@ public class CommandParser {
         }
 
         if (commandParts.isEmpty()) {
-          // error
           throw new IllegalArgumentException("Expected at least one argument for a command");
         }
 
@@ -80,7 +79,7 @@ public class CommandParser {
           command.addArgument(commandParts.get(i));
         }
 
-        // add opts
+        // naive way to add opts
         if (commandParts.size() > i) {
           command.addOpts(commandParts.get(i));
         }
@@ -91,7 +90,7 @@ public class CommandParser {
     }
 
     if (!matched) {
-      throw new IllegalArgumentException("Input " + input + " was malformed");
+      throw new IllegalArgumentException("Command " + input + " was malformed");
     }
 
     return command;

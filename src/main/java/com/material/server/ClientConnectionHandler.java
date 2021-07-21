@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import org.slf4j.Logger;
@@ -56,9 +57,7 @@ public class ClientConnectionHandler implements Runnable {
           if (response.contains("\n")) {
             String[] lines = response.split("\n");
             out.println("START_LINES");
-            for (String line : lines) {
-              out.println(line);
-            }
+            Arrays.stream(lines).forEach(out::println);
             out.println("END_LINES");
           } else {
             out.println(response);
