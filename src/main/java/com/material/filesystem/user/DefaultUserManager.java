@@ -96,24 +96,18 @@ public class DefaultUserManager implements UserManager {
       try {
         if (_userDb.containsKey(username)) {
           User user = _userDb.get(username);
-
-          _loggedInUsersLock.lock();
-          try {
-            if (_allowDuplicateSessions || !_loggedInUsers.containsKey(username)) {
-              if (passwordMd5.equals(user.getPasswordHash())) {
-                _currentUser.set(user);
-                _loggedInUsers.put(username, user);
-              } else {
-                throw new UserSecurityException("Username and/or password was invalid");
-              }
+          if (_allowDuplicateSessions || !_loggedInUsers.containsKey(username)) {
+            if (passwordMd5.equals(user.getPasswordHash())) {
+              _currentUser.set(user);
+              _loggedInUsers.put(username, user);
             } else {
-              throw new UserSecurityException("User " + username
-                  + " is already logged in in another terminal, logout first, or enable multiple sessions");
+              throw new UserSecurityException("Username and/or password was invalid");
             }
-            return user;
-          } finally {
-            _loggedInUsersLock.unlock();
+          } else {
+            throw new UserSecurityException("User " + username
+                + " is already logged in in another terminal, logout first, or enable multiple sessions");
           }
+          return user;
         } else {
           throw new UserSecurityException("Username and/or password was invalid");
         }
@@ -153,7 +147,7 @@ public class DefaultUserManager implements UserManager {
 
   @Override
   public void checkLoggedIn() throws UserSecurityException {
-    if (_currentUser.get() == null) {
+    if (_currentUser.get() == GUEST_USER) {
       throw new UserSecurityException("User not logged in");
     }
   }
