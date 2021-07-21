@@ -1,6 +1,25 @@
 package com.material.filesystem;
 
+/**
+ * This interface represents some object in the file system. This can be a File, Directory, or some type of link.
+ */
 public interface FileSystemObject {
+  /**
+   * Set upon creation, returns the creation time, in ms since 1970
+   */
+  long getCreationTime();
+
+  /**
+   * Set each time object is updated, current time  in ms since 1970
+   */
+  void setLastUpdatedTime();
+
+  /**
+   * returns the time of last update, in ms since 1970
+   * @return the last updated time
+   */
+  long getLastUpdatedTime();
+
   /**
    * The name for this file system object.
    * @return aa String
@@ -14,14 +33,8 @@ public interface FileSystemObject {
   void setName(String name);
 
   /**
-   * Disable mutation on this FileSystemObject, this includes name change or content changes.
-   * @return this FilelSystemObject
+   * Creates a copy of this File System Object
+   * @return FileSystemObject
    */
-  FileSystemObject makeImmutable();
-
-  /**
-   * Returns <pre>true</pre> if this object is immutable.
-   * @return a boolean
-   */
-  boolean isImmutable();
+  FileSystemObject copy();
 }
